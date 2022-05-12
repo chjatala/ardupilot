@@ -23,6 +23,7 @@
 #include "AP_Beacon_Agilica.h"
 
 //#define AGILICA_LOG_ENABLE
+#define AGILICA_PARSOR
 
 #define AGILICA_MSG_LEN_MIN                  12
 #define AGILICA_MSG_SYNC                     0x61    // message sync
@@ -134,6 +135,7 @@ bool AP_Beacon_Agilica::verify_checksum()
 
 void AP_Beacon_Agilica::parse_vehicle_pos_msg(const uint32_t num_beacon)
 {   
+#ifndef AGILICA_PARSOR
     uint8_t *p;
 
     int16_t x = 0;
@@ -150,6 +152,11 @@ void AP_Beacon_Agilica::parse_vehicle_pos_msg(const uint32_t num_beacon)
     p = (uint8_t *)&z;
     *p++ = _msg_buf[6];
     *p = _msg_buf[7];
+#else
+    int16_t x = ((uint16_t)(_msg_buf[2])) | ((uint16_t)(_msg_buf[3] << 8));
+    int16_t y = ((uint16_t)(_msg_buf[4])) | ((uint16_t)(_msg_buf[5] << 8));
+    int16_t z = ((uint16_t)(_msg_buf[6])) | ((uint16_t)(_msg_buf[7] << 8));
+#endif
 
     float accuracy_estimate = _msg_buf[8]*0.01f;
 #ifdef AGILICA_LOG_ENABLE
@@ -166,10 +173,15 @@ void AP_Beacon_Agilica::parse_vehicle_pos_msg(const uint32_t num_beacon)
     for (uint8_t i = 9; i < (_write_index_buf - 1); i += 3) {
         uint8_t beacon_id = _msg_buf[i];
 
+#ifndef AGILICA_PARSOR
         uint16_t beacon_dist = 0;
         p = (uint8_t *)&beacon_dist;
         *p++ = _msg_buf[i + 1];
-        *p = _msg_buf[i + 2];        
+        *p = _msg_buf[i + 2];  
+#else
+        uint16_t beacon_dist = ((uint16_t)(_msg_buf[i + 1])) | ((uint16_t)(_msg_buf[ i + 2] << 8));
+#endif    
+
 #ifdef AGILICA_LOG_ENABLE
         AP::logger().Write("AGLB", "bcnId,bcnDst", "BH",
                            beacon_id, beacon_dist);
@@ -183,11 +195,12 @@ void AP_Beacon_Agilica::parse_vehicle_pos_msg(const uint32_t num_beacon)
 
 void AP_Beacon_Agilica::parse_beacon_pos_msg(const uint32_t num_beacon)
 {    
-
-    uint8_t *p;
     for (uint8_t i = 2; i < (_write_index_buf - 1); i += 7) {
         uint8_t beacon_id = _msg_buf[i];
         
+#ifndef AGILICA_PARSOR
+        uint8_t *p;
+
         int16_t x = 0;
         p = (uint8_t *)&x;
         *p++ = _msg_buf[i + 1];
@@ -201,7 +214,13 @@ void AP_Beacon_Agilica::parse_beacon_pos_msg(const uint32_t num_beacon)
         int16_t z = 0;
         p = (uint8_t *)&z;
         *p++ = _msg_buf[i + 5];
-        *p = _msg_buf[i + 6];    
+        *p = _msg_buf[i + 6];  
+#else
+        int16_t x = ((uint16_t)(_msg_buf[i + 1])) | ((uint16_t)(_msg_buf[i + 2] << 8));
+        int16_t y = ((uint16_t)(_msg_buf[i + 3])) | ((uint16_t)(_msg_buf[i + 4] << 8));
+        int16_t z = ((uint16_t)(_msg_buf[i + 5])) | ((uint16_t)(_msg_buf[i + 6] << 8));
+#endif  
+
 #ifdef AGILICA_LOG_ENABLE
         AP::logger().Write("AGLB", "tsMS,bcnId,bpx,bpx,bpz", "IBhhh",
         _last_update_ms, beacon_id, x, y, z);  
