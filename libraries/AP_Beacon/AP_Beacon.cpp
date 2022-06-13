@@ -100,8 +100,8 @@ void AP_Beacon::init(void)
     } else if (_type == AP_BeaconType_Marvelmind) {
         _driver = new AP_Beacon_Marvelmind(*this, serial_manager);
     } else if (_type == AP_BeaconType_Nooploop) {
-        _driver = new AP_Beacon_Nooploop(*this, serial_manager);
-        //_driver = new AP_Beacon_Agilica(*this, serial_manager);
+        //_driver = new AP_Beacon_Nooploop(*this, serial_manager);
+        _driver = new AP_Beacon_Agilica(*this, serial_manager);
     } else if (_type == AP_BeaconType_Agilica) {
         _driver = new AP_Beacon_Agilica(*this, serial_manager);
     }

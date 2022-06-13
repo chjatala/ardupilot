@@ -33,6 +33,15 @@
 
 extern const AP_HAL::HAL& hal;
 
+#define MM_DEBUG_LEVEL 0
+
+#if MM_DEBUG_LEVEL
+  #include <GCS_MAVLink/GCS.h>
+  #define Debug(level, fmt, args ...)  do { if (level <= MM_DEBUG_LEVEL) { gcs().send_text(MAV_SEVERITY_INFO, fmt, ## args); } } while (0)
+#else
+  #define Debug(level, fmt, args ...)
+#endif
+
 AP_Beacon_Agilica::AP_Beacon_Agilica(AP_Beacon &frontend, AP_SerialManager &serial_manager) :
     AP_Beacon_Backend(frontend)
 {
@@ -43,8 +52,9 @@ AP_Beacon_Agilica::AP_Beacon_Agilica(AP_Beacon &frontend, AP_SerialManager &seri
 
 #ifdef AGILICA_LOG_ENABLE
     AP::logger().Write("AGLB", "tsMS", "I",
-        AP_HAL::millis());  
+        AP_HAL::millis());     
 #endif
+    //Debug(2, "Beacon %.2f ms", (float)AP_HAL::millis()); 
 }
 
 // return true if sensor is basically healthy (we are receiving data)
@@ -221,10 +231,11 @@ void AP_Beacon_Agilica::parse_beacon_pos_msg(const uint32_t num_beacon)
         int16_t z = ((uint16_t)(_msg_buf[i + 5])) | ((uint16_t)(_msg_buf[i + 6] << 8));
 #endif  
 
-#ifdef AGILICA_LOG_ENABLE
+#ifdef AGILICA_LOG_ENABLE      
         AP::logger().Write("AGLB", "tsMS,bcnId,bpx,bpx,bpz", "IBhhh",
-        _last_update_ms, beacon_id, x, y, z);  
+        _last_update_ms, beacon_id, x, y, z);          
 #endif
+      // Debug(2, "Beacon %d is %.2fm, %.2fm, %.2fm", beacon_id, x*0.01f, y*0.01f, z*0.01f);
 
         Vector3f pos(x * 0.01f, y * 0.01f, -z * 0.01f);
         set_beacon_position(beacon_id, pos);
