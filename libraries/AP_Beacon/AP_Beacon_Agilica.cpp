@@ -24,10 +24,26 @@
 
 //#define AGILICA_LOG_ENABLE
 
+#ifndef AGILICA_LEGACY
+#define AGILICA_MSG_LEN_MIN                  5
+#else
 #define AGILICA_MSG_LEN_MIN                  12
+#endif
 #define AGILICA_MSG_SYNC                     0x61    // message sync
+
 #define AGILICA_VEHICLE_POS_MSGID            0x01
 #define AGILICA_BEACON_POS_MSGID             0x02
+#ifndef AGILICA_LEGACY
+#define AGILICA_BEACON_AUX_MSGID             0x03
+#define AGILICA_STATUS_MSGID                 0x04
+
+/* STATUS VALUES */
+#define AGILICA_STATUS_OKAY             0
+#define AGILICA_STATUS_WAITING_SYNC     1
+#define AGILICA_STATUS_NOT_ENOUGH_ANK   2
+#define AGILICA_STATUS_NLOSOFIL         3
+#endif
+
 #define AGILICA_BEACON_DISTANCE_MAX          20000 //in cm
 
 extern const AP_HAL::HAL& hal;
@@ -112,7 +128,16 @@ void AP_Beacon_Agilica::update(void)
                         if (msgid == AGILICA_VEHICLE_POS_MSGID) {
                             parse_vehicle_pos_msg(num_beacon);
                             _last_update_ms = AP_HAL::millis();
-                        } else if (msgid == AGILICA_BEACON_POS_MSGID) {
+                        } 
+#ifndef AGILICA_LEGACY
+                        else if (msgid == AGILICA_BEACON_AUX_MSGID) {
+                            parse_beacon_aux_msg(num_beacon);
+                        }
+                        else if (msgid == AGILICA_STATUS_MSGID) {
+                            parse_status_msg(num_beacon);
+                        }
+#endif
+                        else if (msgid == AGILICA_BEACON_POS_MSGID) {
                             parse_beacon_pos_msg(num_beacon);
                             _last_update_ms = AP_HAL::millis();
                         } 
@@ -150,6 +175,11 @@ void AP_Beacon_Agilica::parse_vehicle_pos_msg(const uint32_t num_beacon)
     int16_t z = ((uint16_t)(_msg_buf[6])) | ((uint16_t)(_msg_buf[7] << 8));
 
     float accuracy_estimate = _msg_buf[8]*0.01f;
+    float xdop = 0;
+#ifndef AGILICA_LEGACY
+    xdop = _msg_buf[9]*0.1f;
+#endif
+
 #ifdef AGILICA_LOG_ENABLE
     AP::logger().Write("AGLB", "tsMS,vpx,vpx,vpz, vpa", "IhhhB",
     _last_update_ms, x, y, z, _msg_buf[8]);
@@ -198,3 +228,48 @@ void AP_Beacon_Agilica::parse_beacon_pos_msg(const uint32_t num_beacon)
         set_beacon_position(beacon_id, pos);
     }
 }
+
+#ifndef AGILICA_LEGACY
+void AP_Beacon_Agilica::parse_status_msg(const uint32_t status)
+{
+    switch (status) {
+        case AGILICA_STATUS_WAITING_SYNC:
+#ifdef AGILICA_LOG_ENABLE 
+            AP::logger().Write("AGLB", "tag,s,WAITING_SYNC");
+#endif
+            break;
+        case AGILICA_STATUS_NOT_ENOUGH_ANK:
+#ifdef AGILICA_LOG_ENABLE 
+            AP::logger().Write("AGLB", "tag,s,NOT_ENOUGH_ANK");
+#endif
+            break;
+        case AGILICA_STATUS_NLOSOFIL:
+#ifdef AGILICA_LOG_ENABLE 
+            AP::logger().Write("AGLB", "tag,s,NLOSOFIL");
+#endif
+            break;
+        case AGILICA_STATUS_OKAY:
+#ifdef AGILICA_LOG_ENABLE 
+            AP::logger().Write("AGLB", "tag,s,OKAY");
+#endif
+            break;
+        default:
+#ifdef AGILICA_LOG_ENABLE 
+            AP::logger().Write("AGLB", "tag,s,UNKNOWN");
+#endif
+            break;
+    }
+
+}
+
+void AP_Beacon_Agilica::parse_beacon_aux_msg(const uint32_t num_beacon)
+{
+    for (uint8_t i = 2; i < (_write_index_buf - 1); i += 2) {
+        uint8_t ankId = _msg_buf[i];
+        int8_t rssi = _msg_buf[i+1];
+#ifdef AGILICA_LOG_ENABLE 
+            AP::logger().Write("AGLB", "ank,i,s","hh", (int)ankId, (int)rssi);
+#endif
+    }
+}
+#endif

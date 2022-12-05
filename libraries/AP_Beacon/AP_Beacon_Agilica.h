@@ -3,6 +3,7 @@
 #include "AP_Beacon_Backend.h"
 
 #define AGILICA_MSG_BUF_MAX      (255)
+//#define AGILICA_LEGACY
 
 class AP_Beacon_Agilica : public AP_Beacon_Backend
 {
@@ -20,6 +21,12 @@ public:
 private:
     // parse vehicle pos message 
     void parse_vehicle_pos_msg(const uint32_t num_beacon);
+#ifndef AGILICA_LEGACY
+    // parse beacon aux msg
+    void parse_beacon_aux_msg(const uint32_t num_beacon);
+    //parse status msg
+    void parse_status_msg(const uint32_t status);
+#endif
     // parse beacon pos message 
     void parse_beacon_pos_msg(const uint32_t num_beacon);
     //verify message checksum
