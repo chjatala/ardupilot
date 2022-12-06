@@ -190,8 +190,11 @@ void AP_Beacon_Agilica::parse_vehicle_pos_msg(const uint32_t num_beacon)
     set_vehicle_position(pos, accuracy_estimate);
 
 
-
+#ifndef AGILICA_LEGACY
+    for (uint8_t i = 10; i < (_write_index_buf - 1); i += 3) {
+#else
     for (uint8_t i = 9; i < (_write_index_buf - 1); i += 3) {
+#endif
         uint8_t beacon_id = _msg_buf[i];
 
         uint16_t beacon_dist = ((uint16_t)(_msg_buf[i + 1])) | ((uint16_t)(_msg_buf[ i + 2] << 8));
