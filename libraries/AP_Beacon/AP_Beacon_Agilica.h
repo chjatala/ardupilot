@@ -3,6 +3,8 @@
 #include "AP_Beacon_Backend.h"
 
 #define AGILICA_MSG_BUF_MAX      (255)
+
+/* Will also parse status and aux beacon messages when line '#define AGILICA_LEGACY' is commented out  */
 //#define AGILICA_LEGACY
 
 class AP_Beacon_Agilica : public AP_Beacon_Backend

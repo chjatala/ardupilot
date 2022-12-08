@@ -38,10 +38,11 @@
 #define AGILICA_STATUS_MSGID                 0x04
 
 /* STATUS VALUES */
-#define AGILICA_STATUS_OKAY             0
-#define AGILICA_STATUS_WAITING_SYNC     1
-#define AGILICA_STATUS_NOT_ENOUGH_ANK   2
-#define AGILICA_STATUS_NLOSOFIL         3
+/* Possible STATUS VALUES in the status message */
+#define AGILICA_STATUS_OKAY             0 // all is good
+#define AGILICA_STATUS_WAITING_SYNC     1 // waiting for synchronization lock.
+#define AGILICA_STATUS_NOT_ENOUGH_ANK   2 // does not receive from enough anchors
+#define AGILICA_STATUS_NLOSOFIL         3 // outlier filter is active
 #endif
 
 #define AGILICA_BEACON_DISTANCE_MAX          20000 //in cm
