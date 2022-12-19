@@ -176,13 +176,16 @@ void AP_Beacon_Agilica::parse_vehicle_pos_msg(const uint32_t num_beacon)
     int16_t z = ((uint16_t)(_msg_buf[6])) | ((uint16_t)(_msg_buf[7] << 8));
 
     float accuracy_estimate = _msg_buf[8]*0.01f;
-    float xdop = 0;
 #ifndef AGILICA_LEGACY
-    xdop = _msg_buf[9]*0.1f;
+    float xdop = _msg_buf[9]*0.1f;
+    /*WARNING: the software fails to compile if there is any unused variable
+     *TODO: user need to implement logic on how to use 'xdop'  
+     */
+    dummySinkXdop(xdop);
 #endif
 
 #ifdef AGILICA_LOG_ENABLE
-    AP::logger().Write("AGLB", "tsMS,vpx,vpx,vpz, vpa", "IhhhB",
+    AP::logger().Write("AGLB", "tsMS,vpx,vpx,vpz,vpa,vxd", "IhhhB",
     _last_update_ms, x, y, z, _msg_buf[8]);
 #endif
 
@@ -268,12 +271,26 @@ void AP_Beacon_Agilica::parse_status_msg(const uint32_t status)
 
 void AP_Beacon_Agilica::parse_beacon_aux_msg(const uint32_t num_beacon)
 {
-    for (uint8_t i = 2; i < (_write_index_buf - 1); i += 2) {
+    for (uint8_t i = 2; i < (_write_index_buf - 1); i += 2) {        
         uint8_t ankId = _msg_buf[i];
         int8_t rssi = _msg_buf[i+1];
+        /*WARNING: the software fails to compile if there is any unused variable
+        *TODO: user need to implement logic on how to use 'ankId' and 'rssi'  
+        */
+        dummySinkBeaconAux(ankId, rssi);
+    }
+}
+
+void AP_Beacon_Agilica::dummySinkXdop(const float xdop)
+{
+    
+
+}
+
+void AP_Beacon_Agilica::dummySinkBeaconAux(const uint8_t ankId, const int8_t rssi)
+{
 #ifdef AGILICA_LOG_ENABLE 
             AP::logger().Write("AGLB", "ank,i,s","hh", (int)ankId, (int)rssi);
 #endif
-    }
 }
 #endif

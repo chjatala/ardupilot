@@ -18,7 +18,7 @@ public:
     bool healthy() override;
 
     // update the state of the sensor
-    void update() override;
+    void update() override;    
 
 private:
     // parse vehicle pos message 
@@ -33,6 +33,9 @@ private:
     void parse_beacon_pos_msg(const uint32_t num_beacon);
     //verify message checksum
     bool verify_checksum();
+
+    void dummySinkXdop(const float xdop);
+    void dummySinkBeaconAux(const uint8_t ankId, const int8_t rssi);
 
     AP_HAL::UARTDriver *_uart = nullptr;
 
