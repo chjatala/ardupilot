@@ -28,14 +28,16 @@ private:
     void parse_beacon_aux_msg(const uint32_t num_beacon);
     //parse status msg
     void parse_status_msg(const uint32_t status);
+    
+    void dummySinkXdop(const float xdop);
+    void dummySinkBeaconAux(const uint8_t ankId, const int8_t rssi);    
 #endif
     // parse beacon pos message 
     void parse_beacon_pos_msg(const uint32_t num_beacon);
     //verify message checksum
     bool verify_checksum();
 
-    void dummySinkXdop(const float xdop);
-    void dummySinkBeaconAux(const uint8_t ankId, const int8_t rssi);
+
 
     AP_HAL::UARTDriver *_uart = nullptr;
 

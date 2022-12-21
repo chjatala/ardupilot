@@ -33,6 +33,7 @@
 
 #define AGILICA_VEHICLE_POS_MSGID            0x01
 #define AGILICA_BEACON_POS_MSGID             0x02
+
 #ifndef AGILICA_LEGACY
 #define AGILICA_BEACON_AUX_MSGID             0x03
 #define AGILICA_STATUS_MSGID                 0x04
@@ -188,7 +189,6 @@ void AP_Beacon_Agilica::parse_vehicle_pos_msg(const uint32_t num_beacon)
     AP::logger().Write("AGLB", "tsMS,vpx,vpx,vpz,vpa,vxd", "IhhhB",
     _last_update_ms, x, y, z, _msg_buf[8]);
 #endif
-
 
     Vector3f pos(Vector3f(x*0.01f, y*0.01f, -z*0.01f));
     set_vehicle_position(pos, accuracy_estimate);
