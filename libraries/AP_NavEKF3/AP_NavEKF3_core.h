@@ -1267,7 +1267,11 @@ private:
     bool rngBcnHealth;                  // boolean true if range beacon measurements have passed innovation consistency check
     ftype varInnovRngBcn;               // range beacon observation innovation variance (m^2)
     ftype innovRngBcn;                  // range beacon observation innovation (m)
+#if (AP_BEACON_MAX_BEACONS > 4)
+    uint32_t lastTimeRngBcn_ms[AP_BEACON_MAX_BEACONS]; // last time we received a range beacon measurement (msec) 
+#else
     uint32_t lastTimeRngBcn_ms[4];      // last time we received a range beacon measurement (msec)
+#endif
     bool rngBcnDataToFuse;              // true when there is new range beacon data to fuse
     Vector3F beaconVehiclePosNED;       // NED position estimate from the beacon system (NED)
     ftype beaconVehiclePosErr;          // estimated position error from the beacon system (m)

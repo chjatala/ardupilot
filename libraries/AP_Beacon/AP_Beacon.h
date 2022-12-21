@@ -23,7 +23,8 @@
 
 class AP_Beacon_Backend;
 
-#define AP_BEACON_MAX_BEACONS 4
+#define AP_BEACON_MAX_BEACONS  8 //4, originally 4 allowed
+
 #define AP_BEACON_TIMEOUT_MS 300
 #define AP_BEACON_MINIMUM_FENCE_BEACONS 3
 
@@ -43,6 +44,7 @@ public:
         AP_BeaconType_Pozyx  = 1,
         AP_BeaconType_Marvelmind = 2,
         AP_BeaconType_Nooploop  = 3,
+        AP_BeaconType_Agilica = 4, 
         AP_BeaconType_SITL   = 10
     };
 
