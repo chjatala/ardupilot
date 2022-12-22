@@ -24,7 +24,7 @@
 
 //#define AGILICA_LOG_ENABLE
 
-#define AGILICA_MSG_LEN_MIN                  5
+#define AGILICA_MSG_LEN_MIN                  3
 #define AGILICA_MSG_SYNC                     0x61    // message sync
 #define AGILICA_VEHICLE_POS_MSGID            0x01
 #define AGILICA_BEACON_POS_MSGID             0x02
