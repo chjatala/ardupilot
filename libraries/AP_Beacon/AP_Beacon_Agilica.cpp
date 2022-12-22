@@ -25,7 +25,7 @@
 //#define AGILICA_LOG_ENABLE
 
 #ifndef AGILICA_LEGACY
-#define AGILICA_MSG_LEN_MIN                  5
+#define AGILICA_MSG_LEN_MIN                  3
 #else
 #define AGILICA_MSG_LEN_MIN                  12
 #endif
